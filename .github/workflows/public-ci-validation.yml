@@ -1,0 +1,45 @@
+name: Public CI Validation
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'README.md'
+  push:
+    branches:
+      - develop
+      - master
+    paths:
+      - '.github/workflows/**'
+      - 'scripts/**'
+      - 'tests/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  yaml-syntax:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse workflow YAML
+        shell: ruby {0}
+        run: |
+          require "yaml"
+          files = Dir[".github/workflows/*.{yml,yaml}"].sort
+          abort "No workflow files" if files.empty?
+          files.each do |file|
+            YAML.parse_file(file)
+            puts "YAML syntax OK: #{file}"
+          end
+
+  mock-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run standalone mock tests
+        run: python3 -m unittest discover -s tests -p 'test_*.py' -v
