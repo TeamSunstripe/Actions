@@ -5,6 +5,10 @@ on:
       - '.github/workflows/**'
       - 'scripts/**'
       - 'tests/**'
+      - 'examples/**'
+      - 'docs/**'
+      - 'rule.md'
+      - 'CHANGELOG.md'
       - 'README.md'
   push:
     branches:
@@ -14,6 +18,11 @@ on:
       - '.github/workflows/**'
       - 'scripts/**'
       - 'tests/**'
+      - 'examples/**'
+      - 'docs/**'
+      - 'rule.md'
+      - 'CHANGELOG.md'
+      - 'README.md'
   workflow_dispatch:
 
 permissions:
@@ -43,3 +52,27 @@ jobs:
       - uses: actions/checkout@v4
       - name: Run standalone mock tests
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
+
+  php-sample:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check PHP source syntax
+        run: |
+          php -l examples/php/Calculator.php
+          php -l tests/php/test_calculator.php
+      - name: Run PHP synthetic assertions
+        run: php tests/php/test_calculator.php
+
+  javascript-sample:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check JavaScript syntax
+        run: |
+          node --check examples/js/validation.cjs
+          node --check tests/js/test_validation.cjs
+      - name: Run JavaScript synthetic assertions
+        run: node tests/js/test_validation.cjs
